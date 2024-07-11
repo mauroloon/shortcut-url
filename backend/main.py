@@ -1,6 +1,7 @@
 import random
 import string
 from typing import Union
+from utils import DynamoManager
 
 from fastapi import FastAPI
 
@@ -48,6 +49,7 @@ def generate_short_cut(url: str):
     """
     
     short_url = generate_short_url()
+    DynamoManager.save_url(url, short_url)
 
     return {"short_url": short_url, "original_url": url}
 
