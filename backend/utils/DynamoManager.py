@@ -3,6 +3,7 @@ from datetime import datetime
 from uuid import uuid4
 
 import boto3
+from boto3.dynamodb.conditions import Key
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -37,10 +38,10 @@ class DynamoManager:
         # Subir el token a DynamoDB
         table.put_item(
             Item={
-                'id': str(uuid4()),
+                'id': short_url,
                 'url': url,
-                'short_url': short_url,
                 'date': datetime.now().strftime('%Y-%m-%d'),
+                'last_date_click': '',
                 'count_clicks': 0,
             }
         )
@@ -62,25 +63,20 @@ class DynamoManager:
         """
         dynamodb = boto3.resource('dynamodb', region_name=REGION_AWS)
         table = dynamodb.Table('short_urls')
-
         try:
             response = table.get_item(
                 Key={
-                    'short_url': short_url
+                    'id': short_url
                 }
             )
         except Exception as e:
             print(e)
             return
 
-        if 'Item' in response:
-            item = response['Item']
-            print("Item retrieved successfully:")
-            print(item)
-        else:
-            print("Item not found")
-
         item = response['Item']
-        item['count_clicks'] += 1
-
+        # NOTE: Al traer 'count_clicks' lo trae como string por lo que no sirve
+        # hacer item['count_clicks'] += 1
+        item['count_clicks'] = int(item['count_clicks']) + 1
+        item['last_date_click'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         table.put_item(Item=item)
+        return item['url']

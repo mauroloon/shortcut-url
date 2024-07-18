@@ -48,7 +48,7 @@ def generate_short_cut(url: str):
         - 10/07/2024
     """
     
-    short_url = generate_short_url()
+    short_url = generate_short_url(12)
     DynamoManager.save_url(url, short_url)
 
     return {"short_url": short_url, "original_url": url}
@@ -71,5 +71,8 @@ def redirect_short_cut(short_url: str):
     """
     # TODO: arreglar error 
     # An error occurred (ValidationException) when calling the GetItem operation: The provided key element does not match the schema
-    DynamoManager.update_clicks(short_url)
-    return {"short_url": short_url, "original_url": "https://www.google.com"}
+    response = DynamoManager.update_clicks(short_url)
+    if response:
+        return {"short_url": short_url, "original_url": response}
+    
+    return {"short_url": short_url, "original_url": None}
