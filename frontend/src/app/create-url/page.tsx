@@ -9,12 +9,12 @@ const CreateUrlPage  = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const response = await fetch('/api/short-url', {
+        const response = await fetch('http://127.0.0.1:8000/short-cut/generate', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ longUrl }),
+        body: JSON.stringify({ url: longUrl }),
         });
 
         const data = await response.json();

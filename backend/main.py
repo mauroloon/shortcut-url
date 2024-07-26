@@ -4,8 +4,25 @@ from typing import Union
 from utils import DynamoManager
 
 from fastapi import FastAPI
+from fastapi import Body
+
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:3000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
@@ -32,7 +49,7 @@ def generate_short_url(length=6):
     return ''.join(random.choice(characters) for _ in range(length))
 
 @app.post("/short-cut/generate")
-def generate_short_cut(url: str):
+def generate_short_cut(url: str = Body(..., embed=True)):
     """
     Api para generar un short url a partir de una url original.
 
